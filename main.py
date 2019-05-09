@@ -19,7 +19,7 @@ import utils
 import pdb
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-
+import pickle as pk
 
 # Get the arguments
 args = get_arguments()
@@ -28,7 +28,7 @@ if args.device=='cuda': device = torch.device(args.device)
 else: device = torch.device('cpu')
 
 
-def load_dataset(dataset,cached=True):
+def load_dataset(dataset,cached=False):
     print("\nLoading dataset...\n")
 
     print("Selected dataset:", args.dataset)
@@ -142,8 +142,6 @@ def load_dataset(dataset,cached=True):
     print("Class weights:", class_weights)
 
     return (train_loader, val_loader, test_loader), class_weights, class_encoding
-
-import pickle as pk
 
 def train(train_loader, val_loader, class_weights, class_encoding, 
             pretrained="/home/xinyu/work/PyTorch-ENet/save/ENet.pt"):
@@ -284,9 +282,8 @@ def predict(model, images, class_encoding):
     utils.imshow_batch(images.data.cpu(), color_predictions)
 
 class Malicious_Autoencoder(nn.Module):
-  def __init__(self,bboxmodel):
+  def __init__(self,bboxmodel,trainvictim=True):
     nn.Module.__init__(self)
-    # self.encode = EncodeBlock(3, 16, padding=1, relu=True)
     self.encode = nn.Conv2d(3,8,3,stride=2,padding=1,bias=True)
     self.decode = nn.ConvTranspose2d(
                     8,
@@ -297,17 +294,25 @@ class Malicious_Autoencoder(nn.Module):
                     output_padding=1,
                     bias=False)
     self.bboxmodel = bboxmodel
-    for p in self.bboxmodel.parameters(): p.requires_grad = False
     self.one = torch.tensor(1.).to(device)
     self.zero = torch.tensor(0.).to(device)
-    self.a = torch.tensor(1.,requires_grad=True).to(device)
+    self.whichtrain(trainvictim)
+    # self.a = torch.tensor(1.,requires_grad=True).to(device)
+
+  def whichtrain(self,trainvictim=True):
+    if trainvictim: 
+      for p in self.parameters(): p.requires_grad = False
+      for p in self.bboxmodel.parameters(): p.requires_grad = True
+    else: 
+      for p in self.bboxmodel.parameters(): p.requires_grad = False
 
   def transformx(self,x):
-    # x = self.encode(x)
-    # x = self.decode(x)
-    # x = torch.min(x,self.one)
-    # x = torch.max(x,self.zero)
-    return x*self.a
+    x = self.encode(x)
+    x = self.decode(x)
+    x = torch.min(x,self.one)
+    x = torch.max(x,self.zero)
+    return x
+    # return x*self.a
 
   def forward(self,x):
     t = self.transformx(x)
@@ -317,6 +322,7 @@ class Malicious_Autoencoder(nn.Module):
     with torch.no_grad():
       data = self.transformx(xvectors)
     print(torch.mean((data-xvectors)**2))
+    print(torch.dist(data,xvectors))
     return data
 
 def trainmal(model, train_loader, val_loader, class_weights, class_encoding,
@@ -413,7 +419,7 @@ def displaymal(model, train_loader, val_loader, class_weights, class_encoding,
     model = model.to(device)
 
     def displaybatch(loader,tag):
-        for i in range(3):
+        for i in range(10):
             images, labels = next(iter(loader))
             print("Image size:", images.size())
             print("Label size:", labels.size())
@@ -447,14 +453,32 @@ def displaymal(model, train_loader, val_loader, class_weights, class_encoding,
             psegs = utils.batch_transform(psegs,label_to_rgb)
             img = newimages[i].numpy().transpose((1,2,0))
             v = psegs[i].numpy().transpose((1,2,0))
-            plt.imsave("trans"+tag+str(i)+".png",img)
-            plt.imsave("transseg"+tag+str(i)+".png",v)
+            plt.imsave("results/trans"+tag+str(i)+".png",img)
+            plt.imsave("results/transseg"+tag+str(i)+".png",v)
             # utils.imshow_batch(newimages, psegs)
 
     print("training images")
     displaybatch(train_loader,"train")
     print("val images")
     displaybatch(val_loader,"val")
+
+def ensemble(model, train_loader, val_loader, class_weights, class_encoding,
+               pretrained="/home/xinyu/work/PyTorch-ENet/save/mal.pt"):
+    stoptrainmal_thres_thres1 = 0.05 # a recon less than this means we can start using the autoencoder to attack
+
+    stoptrainmal_recon_thres2 = 32 # a recon loss less than this means we can continue to next it
+
+    print("\n Training Ensemble...\n")
+
+    num_classes = len(class_encoding)
+
+    model = Malicious_Autoencoder(model,trainvictim=True)
+
+    if pretrained: model.load_state_dict(torch.load(pretrained)["state_dict"])
+
+    model = model.to(device)
+
+
 
 if __name__ == '__main__':
 
