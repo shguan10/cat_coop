@@ -1,0 +1,25 @@
+ARGUMENTS
+batch_size: 10
+dataset: cityscapes
+dataset_dir: /home/xinyu/work/Cityscapes
+device: cuda
+epochs: 300
+height: 360
+ignore_unlabeled: True
+imshow_batch: False
+learning_rate: 0.0005
+lr_decay: 0.1
+lr_decay_epochs: 100
+mode: trainmal
+name: mal.pt
+print_step: False
+resume: False
+save_dir: save
+weighing: ENet
+weight_decay: 0.0002
+width: 480
+workers: 4
+
+BEST VALIDATION
+Epoch: 10
+Mean IoU: 0.06907780132136394
