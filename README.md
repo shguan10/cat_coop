@@ -3,13 +3,16 @@
 A way to discover faults in the training dataset and model. The malicious autoencoder, or attacker, learns small transformations to the input that cause the base or victim model to fail.
 
 This repository was modified from an [open source](https://github.com/davidtvs/PyTorch-ENet) version of the ENet architecture. The changes made to this repository that enables the training of a malicious autoencoder are in the following files:
+  - mal.py
   - data/cityscapes.py
   - args.py
   - main.py
-  - README.md
   - models/enet.py
   - test.py
   - train.py
+  - README.md
+
+The rest of the directory is due to [davidtvs](https://github.com/davidtvs/PyTorch-ENet)
 
 ## Dataset Downnload Instructions
 
