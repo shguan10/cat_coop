@@ -28,7 +28,7 @@ We used the Cityscapes dataset, which can be found [here](https://www.cityscapes
 5. Save the results to the results directory ```python main.py --dis```
 
 # Example Results
-<img src="https://github.com/shguan10/cat_coop/blob/master/results/origtrain0.png" width="240" height="180" border="10" />
+<img src="results/origtrain0.png" width="240" height="180" border="10" />
 <img src="https://github.com/shguan10/cat_coop/blob/master/results/origsegtrain0.png" width="240" height="180" border="10" />
 <img src="https://github.com/shguan10/cat_coop/blob/master/results/transtrain0.png" width="240" height="180" border="10" />
 <img src="https://github.com/shguan10/cat_coop/blob/master/results/transsegtrain0.png" width="240" height="180" border="10" />
