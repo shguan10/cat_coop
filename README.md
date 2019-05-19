@@ -28,9 +28,22 @@ We used the Cityscapes dataset, which can be found [here](https://www.cityscapes
 5. Save the results to the results directory ```python main.py --dis```
 
 # Example Results
-
-
-
+Original
+<img src="https://github.com/shguan10/cat_coop/blob/master/results/origtrain0.png" width="240" height="180" border="10" />
+Original, Segmented
+<img src="https://github.com/shguan10/cat_coop/blob/master/results/origsegtrain0.png" width="240" height="180" border="10" />
+Transformed
+<img src="https://github.com/shguan10/cat_coop/blob/master/results/transtrain0.png" width="240" height="180" border="10" />
+Transformed, Segmented
+<img src="https://github.com/shguan10/cat_coop/blob/master/results/transsegtrain0.png" width="240" height="180" border="10" />
+Original
+<img src="https://github.com/shguan10/cat_coop/blob/master/results/origtrain1.png" width="240" height="180" border="10" />
+Original, Segmented
+<img src="https://github.com/shguan10/cat_coop/blob/master/results/origsegtrain1.png" width="240" height="180" border="10" />
+Transformed
+<img src="https://github.com/shguan10/cat_coop/blob/master/results/transtrain1.png" width="240" height="180" border="10" />
+Transformed, Segmented
+<img src="https://github.com/shguan10/cat_coop/blob/master/results/transsegtrain1.png" width="240" height="180" border="10" />
 # PyTorch-ENet
 
 PyTorch (v1.0.0) implementation of [*ENet: A Deep Neural Network Architecture for Real-Time Semantic Segmentation*](https://arxiv.org/abs/1606.02147), ported from the lua-torch implementation [ENet-training](https://github.com/e-lab/ENet-training) created by the authors.
