@@ -1,4 +1,6 @@
-# Notes from Xinyu Guan
+# Malicious Autoencoder
+
+A way to discover faults in the training dataset and model. The malicious autoencoder, or attacker, learns small transformations to the input that cause the base or victim model to fail.
 
 This repository was modified from an [open source](https://github.com/davidtvs/PyTorch-ENet) version of the ENet architecture. The changes made to this repository that enables the training of a malicious autoencoder are in the following files:
   - data/cityscapes.py
@@ -13,7 +15,7 @@ This repository was modified from an [open source](https://github.com/davidtvs/P
 
 We used the Cityscapes dataset, which can be found [here](https://www.cityscapes-dataset.com/).
 1. Create a Cityscapes account.
-2. From the [download link](https://www.cityscapes-dataset.com/downloads/), download the gtFine_trainvaltest.zip and leftImg8bit_trainvaltest.zip. The former file contains the segmentation labels, and the latter contains the images.
+2. [Download](https://www.cityscapes-dataset.com/downloads/) the gtFine_trainvaltest.zip and leftImg8bit_trainvaltest.zip. The former file contains the segmentation labels, and the latter contains the images.
 3. Create the folder ../Cityscapes
 4. Unzip the two files into ../Cityscapes. Contents of ../Cityscapes should be
      - gtFine
@@ -33,9 +35,9 @@ We used the Cityscapes dataset, which can be found [here](https://www.cityscapes
 Visualizations of the Original image and ENet segmentations, with the transformed image and its segmentations. The first row indicates images, the second row indicates segmentation. The columns alternate between original and attacked, with the first column being the original image and label. The first two columns come from the training set, and the rest come from the validation set.
 
 <img src="iouvclass.png"/>
-Performance of the IoU metric before and after the Enet attack. The IoU metric is defined as the area of the intersection between the predicted segmentation and the actual segmentation, divided by the union of the predicted and actual. An IoU of 1 indicates perfect segmentation for a particular class, while 0 indicates failure. Credit: [chenblair](https://github.com/chenblair)
+Performance of the IoU metric before and after the Enet attack. The IoU metric is defined as the area of the intersection between the predicted segmentation and the actual segmentation, divided by the union of the predicted and actual. An IoU of 1 indicates perfect segmentation for a particular class, while 0 indicates failure. Credit: Blair Chen
 
-# PyTorch-ENet, notes from [davidtvs](https://github.com/davidtvs/PyTorch-ENet)
+# [PyTorch-ENet](https://github.com/davidtvs/PyTorch-ENet)
 
 PyTorch (v1.0.0) implementation of [*ENet: A Deep Neural Network Architecture for Real-Time Semantic Segmentation*](https://arxiv.org/abs/1606.02147), ported from the lua-torch implementation [ENet-training](https://github.com/e-lab/ENet-training) created by the authors.
 
