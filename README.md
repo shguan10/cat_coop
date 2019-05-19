@@ -28,14 +28,10 @@ We used the Cityscapes dataset, which can be found [here](https://www.cityscapes
 5. Save the results to the results directory ```python main.py --dis```
 
 # Example Results
-<img src="results/origtrain0.png" width="240" height="180" border="10" />
-<img src="https://github.com/shguan10/cat_coop/blob/master/results/origsegtrain0.png" width="240" height="180" border="10" />
-<img src="https://github.com/shguan10/cat_coop/blob/master/results/transtrain0.png" width="240" height="180" border="10" />
-<img src="https://github.com/shguan10/cat_coop/blob/master/results/transsegtrain0.png" width="240" height="180" border="10" />
-<img src="https://github.com/shguan10/cat_coop/blob/master/results/origtrain1.png" width="240" height="180" border="10" />
-<img src="https://github.com/shguan10/cat_coop/blob/master/results/origsegtrain1.png" width="240" height="180" border="10" />
-<img src="https://github.com/shguan10/cat_coop/blob/master/results/transtrain1.png" width="240" height="180" border="10" />
-<img src="https://github.com/shguan10/cat_coop/blob/master/results/transsegtrain1.png" width="240" height="180" border="10" />
+
+<img src="plots.png"/>
+Visualizations of the Original image and ENet segmentations, with the transformed image and its segmentations. The first row indicates images, the second row indicates segmentation. The columns alternate between original and attacked, with the first column being the original image and label. The first two columns come from the training set, and the rest come from the validation set.
+
 
 # PyTorch-ENet
 
