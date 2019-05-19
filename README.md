@@ -9,7 +9,7 @@ This repository was modified from an [open source](https://github.com/davidtvs/P
   - test.py
   - train.py
 
-# Dataset Downnload Instructions
+## Dataset Downnload Instructions
 
 We used the Cityscapes dataset, which can be found [here](https://www.cityscapes-dataset.com/).
 1. Create a Cityscapes account.
@@ -19,7 +19,7 @@ We used the Cityscapes dataset, which can be found [here](https://www.cityscapes
      - gtFine
      - leftImg8bit
 
-# Instructions to replicate results
+## Instructions to replicate results
 
 1. After downloading the dataset, install the packages listed in requirements.txt
 2. You can now invoke the main.py from the command: ```python main.py  --help```
@@ -27,13 +27,13 @@ We used the Cityscapes dataset, which can be found [here](https://www.cityscapes
 4. (Optional) Retrain the attacker (saved to save/mal.pt): ```python main.py --trainmal```
 5. Save results the results to the results directory: ```python main.py --dis```
 
-# Example Results
+## Example Results
 
 <img src="plots.png"/>
 Visualizations of the Original image and ENet segmentations, with the transformed image and its segmentations. The first row indicates images, the second row indicates segmentation. The columns alternate between original and attacked, with the first column being the original image and label. The first two columns come from the training set, and the rest come from the validation set.
 
 <img src="iouvclass.png"/>
-Performance of the IoU metric before and after the Enet attack. The IoU metric is defined as the area of the intersection between the predicted segmentation and the actual segmentation, divided by the union of the predicted and actual. An IoU of 1 indicates perfect segmentation for a particular class, while 0 indicates failure. Credit: [Blair Chen](chenblair)
+Performance of the IoU metric before and after the Enet attack. The IoU metric is defined as the area of the intersection between the predicted segmentation and the actual segmentation, divided by the union of the predicted and actual. An IoU of 1 indicates perfect segmentation for a particular class, while 0 indicates failure. Credit: [Blair Chen](https://github.com/chenblair)
 
 # PyTorch-ENet, notes from [davidtvs](https://github.com/davidtvs/PyTorch-ENet)
 
