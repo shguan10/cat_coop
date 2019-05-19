@@ -12,7 +12,7 @@ This repository was modified from an [open source](https://github.com/davidtvs/P
   - train.py
   - README.md
 
-The rest of the directory is due to [davidtvs](https://github.com/davidtvs/PyTorch-ENet)
+The rest of the repository is due to [davidtvs](https://github.com/davidtvs/PyTorch-ENet)
 
 ## Dataset Downnload Instructions
 
