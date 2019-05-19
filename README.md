@@ -33,7 +33,7 @@ We used the Cityscapes dataset, which can be found [here](https://www.cityscapes
 Visualizations of the Original image and ENet segmentations, with the transformed image and its segmentations. The first row indicates images, the second row indicates segmentation. The columns alternate between original and attacked, with the first column being the original image and label. The first two columns come from the training set, and the rest come from the validation set.
 
 <img src="iouvclass.png"/>
-Performance of the IoU metric before and after the Enet attack. The IoU metric is defined as the area of the intersection between the predicted segmentation and the actual segmentation, divided by the union of the predicted and actual. An IoU of 1 indicates perfect segmentation for a particular class, while 0 indicates failure. Credit: [Blair Chen](https://github.com/chenblair)
+Performance of the IoU metric before and after the Enet attack. The IoU metric is defined as the area of the intersection between the predicted segmentation and the actual segmentation, divided by the union of the predicted and actual. An IoU of 1 indicates perfect segmentation for a particular class, while 0 indicates failure. Credit: [chenblair](https://github.com/chenblair)
 
 # PyTorch-ENet, notes from [davidtvs](https://github.com/davidtvs/PyTorch-ENet)
 
