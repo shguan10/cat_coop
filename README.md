@@ -22,10 +22,10 @@ We used the Cityscapes dataset, which can be found [here](https://www.cityscapes
 # Instructions to replicate results
 
 1. After downloading the dataset, install the packages listed in requirements.txt
-2. You can now invoke the main.py from the command like so ```python main.py  --help```
-3. (Optional) Retrain the base model (current model saved to save/ENet.pt) ```python main.py --train --reload-class-weights```
-4. (Optional) Retrain the attacker (saved to save/mal.pt) ```python main.py --trainmal```
-5. Save the results to the results directory ```python main.py --dis```
+2. You can now invoke the main.py from the command: ```python main.py  --help```
+3. (Optional) Retrain the base model (current model saved to save/ENet.pt): ```python main.py --train --reload-class-weights```
+4. (Optional) Retrain the attacker (saved to save/mal.pt): ```python main.py --trainmal```
+5. Save results the results to the results directory: ```python main.py --dis```
 
 # Example Results
 

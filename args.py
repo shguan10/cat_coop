@@ -79,7 +79,7 @@ def get_arguments():
         "--height",
         type=int,
         default=240,
-        help="The image height. Default: 360")
+        help="The image height. Default: 240")
     parser.add_argument(
         "--width",
         type=int,
