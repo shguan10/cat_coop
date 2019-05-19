@@ -15,7 +15,7 @@ def get_arguments():
         default='test',
         help=("train: performs training and validation; test: tests the model "
               "found in \"--save_dir\" with name \"--name\" on \"--dataset\"; "
-              "full: combines train and test modes. Default: train"))
+              "full: combines train and test modes; trainmal: trains the attacker; dis: saves the results to the results directory. Default: train"))
     parser.add_argument(
         "--resume",
         action='store_true',
@@ -65,11 +65,16 @@ def get_arguments():
         default='cityscapes',
         help="Dataset to use. Default: camvid")
     parser.add_argument(
+        "--reload-class-weights",
+        type=bool,
+        default=False,
+        help="Reload class weights, and cache into class_weights.pk. Default: False")
+    parser.add_argument(
         "--dataset-dir",
         type=str,
-        default="/home/xinyu/work/Cityscapes",
+        default="../Cityscapes",
         help="Path to the root directory of the selected dataset. "
-        "Default: data/CamVid")
+        "Default: ../Cityscapes")
     parser.add_argument(
         "--height",
         type=int,
@@ -119,9 +124,24 @@ def get_arguments():
         default='ENet',
         help="Name given to the model when saving. Default: ENet")
     parser.add_argument(
+        "--malname",
+        type=str,
+        default='mal',
+        help="Name given to the attacker when saving. Default: mal")
+    parser.add_argument(
         "--save-dir",
         type=str,
         default='save',
         help="The directory where models are saved. Default: save")
+    parser.add_argument(
+        "--pretrained",
+        type=str,
+        default='',
+        help="The filename of pretrained model. Default: ''. (Empty string denotes retrain the model)")
+    parser.add_argument(
+        "--malpretrained",
+        type=str,
+        default='',
+        help="The filename of pretrained malicious autoencoder. Default: ''. (Empty string Denotes retrain the attacker)")
 
     return parser.parse_args()

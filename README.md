@@ -1,6 +1,6 @@
-# Notes from xguan
+# Notes from Xinyu Guan
 
-This repository was taken from an [open source](https://github.com/davidtvs/PyTorch-ENet) version of the ENet architecture. Since we were only training the attacker, we did not write the ENet model from scratch but took it from github. The changes that we made to this repository that enables the training of a malicious autoencoder are in the following files:
+This repository was modified from an [open source](https://github.com/davidtvs/PyTorch-ENet) version of the ENet architecture. The changes made to this repository that enables the training of a malicious autoencoder are in the following files:
   - data/cityscapes.py
   - args.py
   - main.py
@@ -19,10 +19,16 @@ We used the Cityscapes dataset, which can be found [here](https://www.cityscapes
      - gtFine
      - leftImg8bit
 
-# Running the code
+# Instructions to replicate results
 
-1. After downloading the dataset, install the prequisites listed in requirements.txt
+1. After downloading the dataset, install the packages listed in requirements.txt
 2. You can now invoke the main.py from the command like so ```python main.py  --help```
+3. (Optional) Retrain the base model (current model saved to save/ENet.pt) ```python main.py --train --reload-class-weights```
+4. (Optional) Retrain the attacker (saved to save/mal.pt) ```python main.py --trainmal```
+5. Save the results to the results directory ```python main.py --dis```
+
+# Example Results
+
 
 
 # PyTorch-ENet

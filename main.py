@@ -21,14 +21,23 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import pickle as pk
 
+from mal import *
+
 # Get the arguments
 args = get_arguments()
 
 if args.device=='cuda': device = torch.device(args.device)
 else: device = torch.device('cpu')
 
-
 def load_dataset(dataset,cached=False):
+    """
+    loads the desired dataset
+    @param dataset : Python module
+      This is either Cityscapes or Camvid. For the purposes of the malicious autoencoder, use the Cityscapes module
+    @param cached : bool
+      Denotes whether the class weights are cached in class_weights.pk
+      If not, the function calculates those again and caches them in class_weights.pk      
+    """
     print("\nLoading dataset...\n")
 
     print("Selected dataset:", args.dataset)
@@ -127,9 +136,9 @@ def load_dataset(dataset,cached=False):
         else:
             class_weights = None
 
-        with open("tmp.pk","wb") as f: pk.dump(class_weights,f)
+        with open("class_weights.pk","wb") as f: pk.dump(class_weights,f)
     else:
-        with open("tmp.pk","rb") as f: class_weights = pk.load(f)
+        with open("class_weights.pk","rb") as f: class_weights = pk.load(f)
 
 
     if class_weights is not None:
@@ -143,8 +152,7 @@ def load_dataset(dataset,cached=False):
 
     return (train_loader, val_loader, test_loader), class_weights, class_encoding
 
-def train(train_loader, val_loader, class_weights, class_encoding, 
-            pretrained="/home/xinyu/work/PyTorch-ENet/save/ENet.pt"):
+def train(train_loader, val_loader, class_weights, class_encoding, pretrained="./save/ENet.pt"):
     print("\nTraining...\n")
 
     num_classes = len(class_encoding)
@@ -225,7 +233,6 @@ def train(train_loader, val_loader, class_weights, class_encoding,
 
     return model
 
-
 def test(model, test_loader, class_weights, class_encoding):
     print("\nTesting...\n")
     num_classes = len(class_encoding)
@@ -261,14 +268,11 @@ def test(model, test_loader, class_weights, class_encoding):
         images, _ = next(iter(test_loader))
         predict(model, images, class_encoding)
 
-
 def predict(model, images, class_encoding):
     images = images.to(device)
 
-    # Make predictions!
     model.eval()
-    with torch.no_grad():
-        predictions = model(images)
+    with torch.no_grad(): predictions = model(images)
 
     # Predictions is one-hot encoded with "num_classes" channels.
     # Convert it to a single int using the indices where the maximum (1) occurs
@@ -281,52 +285,14 @@ def predict(model, images, class_encoding):
     color_predictions = utils.batch_transform(predictions.cpu(), label_to_rgb)
     utils.imshow_batch(images.data.cpu(), color_predictions)
 
-class Malicious_Autoencoder(nn.Module):
-  def __init__(self,bboxmodel,trainvictim=True):
-    nn.Module.__init__(self)
-    self.encode = nn.Conv2d(3,8,3,stride=2,padding=1,bias=True)
-    self.decode = nn.ConvTranspose2d(
-                    8,
-                    3,
-                    kernel_size=3,
-                    stride=2,
-                    padding=1,
-                    output_padding=1,
-                    bias=False)
-    self.bboxmodel = bboxmodel
-    self.one = torch.tensor(1.).to(device)
-    self.zero = torch.tensor(0.).to(device)
-    self.whichtrain(trainvictim)
-    # self.a = torch.tensor(1.,requires_grad=True).to(device)
-
-  def whichtrain(self,trainvictim=True):
-    if trainvictim: 
-      for p in self.parameters(): p.requires_grad = False
-      for p in self.bboxmodel.parameters(): p.requires_grad = True
-    else: 
-      for p in self.bboxmodel.parameters(): p.requires_grad = False
-
-  def transformx(self,x):
-    x = self.encode(x)
-    x = self.decode(x)
-    x = torch.min(x,self.one)
-    x = torch.max(x,self.zero)
-    return x
-    # return x*self.a
-
-  def forward(self,x):
-    t = self.transformx(x)
-    return (t,self.bboxmodel(t))
-
-  def gettransformeddata(self,xvectors):
-    with torch.no_grad():
-      data = self.transformx(xvectors)
-    print(torch.mean((data-xvectors)**2))
-    print(torch.dist(data,xvectors))
-    return data
-
 def trainmal(model, train_loader, val_loader, class_weights, class_encoding,
-            pretrained="/home/xinyu/work/PyTorch-ENet/save/mal.pt"):
+             pretrained="./save/mal.pt"):
+    """
+    this function trains the attacker
+    @param pretrained : String
+      None => Doesn't initialize the attacker with pretrained weights
+      filename => initializes the attacker with pretrained weights in filename
+    """
     print("\nTraining Attacker...\n")
 
     num_classes = len(class_encoding)
@@ -396,20 +362,27 @@ def trainmal(model, train_loader, val_loader, class_weights, class_encoding,
                 # best_miou = miou
                 best_loss = loss
                 n = args.name
-                args.name = 'mal.pt'
+                args.name = args.malname
                 utils.save_checkpoint(model, optimizer, epoch + 1, best_miou, args)
                 args.name = n
 
     return model
 
-def out2segs(images):
-    assert len(images.shape)==4
-    return torch.argmax(images,dim=1)
 
 def displaymal(model, train_loader, val_loader, class_weights, class_encoding,
-               pretrained="/home/xinyu/work/PyTorch-ENet/save/mal.pt"):
+               pretrained="./save/mal.pt"):
+    """
+    this function saves the results of the attacker to the results directory
+    @param pretrained : String
+      None => Doesn't initialize the attacker with pretrained weights
+      filename => initializes the attacker with pretrained weights in filename
+    """
     print("\n Displaying Attacker...\n")
-
+  
+    def out2segs(images):
+      assert len(images.shape)==4
+      return torch.argmax(images,dim=1)
+  
     num_classes = len(class_encoding)
 
     model = Malicious_Autoencoder(model)
@@ -419,6 +392,14 @@ def displaymal(model, train_loader, val_loader, class_weights, class_encoding,
     model = model.to(device)
 
     def displaybatch(loader,tag):
+        """
+        helper function that displays 10 random images from the loader,
+        their predicted segmentations under the victim model,
+        their transformations under the malicious autoencoder,
+        and the predicted segmentations of their transformations
+
+        It saves these pictures to the results directory.
+        """
         for i in range(10):
             images, labels = next(iter(loader))
             print("Image size:", images.size())
@@ -437,7 +418,6 @@ def displaymal(model, train_loader, val_loader, class_weights, class_encoding,
             vlabels = utils.batch_transform(vlabels,label_to_rgb)
 
             print("Original...")
-            # utils.imshow_batch(images, vlabels)
             img = images[i].numpy().transpose((1,2,0))
             v = vlabels[i].numpy().transpose((1,2,0))
 
@@ -455,30 +435,11 @@ def displaymal(model, train_loader, val_loader, class_weights, class_encoding,
             v = psegs[i].numpy().transpose((1,2,0))
             plt.imsave("results/trans"+tag+str(i)+".png",img)
             plt.imsave("results/transseg"+tag+str(i)+".png",v)
-            # utils.imshow_batch(newimages, psegs)
 
     print("training images")
     displaybatch(train_loader,"train")
     print("val images")
     displaybatch(val_loader,"val")
-
-def ensemble(model, train_loader, val_loader, class_weights, class_encoding,
-               pretrained="/home/xinyu/work/PyTorch-ENet/save/mal.pt"):
-    stoptrainmal_thres_thres1 = 0.05 # a recon less than this means we can start using the autoencoder to attack
-
-    stoptrainmal_recon_thres2 = 32 # a recon loss less than this means we can continue to next it
-
-    print("\n Training Ensemble...\n")
-
-    num_classes = len(class_encoding)
-
-    model = Malicious_Autoencoder(model,trainvictim=True)
-
-    if pretrained: model.load_state_dict(torch.load(pretrained)["state_dict"])
-
-    model = model.to(device)
-
-
 
 if __name__ == '__main__':
 
@@ -495,11 +456,11 @@ if __name__ == '__main__':
         from data import Cityscapes as dataset
     else: raise RuntimeError("\"{0}\" is not a supported dataset.".format(args.dataset))
 
-    loaders, w_class, class_encoding = load_dataset(dataset,cached=True)
+    loaders, w_class, class_encoding = load_dataset(dataset,cached=not args.reload_class_weights)
     train_loader, val_loader, test_loader = loaders
 
     if args.mode.lower() in {'train', 'full'}:
-        model = train(train_loader, val_loader, w_class, class_encoding)
+        model = train(train_loader, val_loader, w_class, class_encoding,pretrained=args.pretrained)
         if args.mode.lower() == 'full':
             test(model, test_loader, w_class, class_encoding)
     elif args.mode.lower() == 'test':
@@ -511,7 +472,7 @@ if __name__ == '__main__':
         # checkpoint
         optimizer = optim.Adam(model.parameters())
 
-        # Load the previoulsy saved model state to the ENet model
+        # Load the previously saved model state to the ENet model
         model = utils.load_checkpoint(model, optimizer, args.save_dir,
                                       args.name)[0]
         print(model)
@@ -525,10 +486,10 @@ if __name__ == '__main__':
         # checkpoint
         optimizer = optim.Adam(model.parameters())
 
-        # Load the previoulsy saved model state to the ENet model
+        # Load the previously saved model state to the ENet model
         model = utils.load_checkpoint(model, optimizer, args.save_dir, args.name)[0]
 
-        trainmal(model, train_loader, test_loader, w_class, class_encoding)
+        trainmal(model, train_loader, test_loader, w_class, class_encoding,pretrained=args.malpretrained)
     
     elif args.mode.lower() == 'dis':
         # Intialize a new ENet model
@@ -542,7 +503,7 @@ if __name__ == '__main__':
         # Load the previoulsy saved model state to the ENet model
         model = utils.load_checkpoint(model, optimizer, args.save_dir, args.name)[0]
 
-        displaymal(model, train_loader, test_loader, w_class, class_encoding)
+        displaymal(model, train_loader, test_loader, w_class, class_encoding,trained=args.malpretrained)
 
     else:
         raise RuntimeError("\"{0}\" is not a valid choice for execution mode.".format(args.mode))

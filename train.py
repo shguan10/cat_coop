@@ -14,7 +14,6 @@ class Train:
     - metric (```Metric``): An instance specifying the metric to return.
     - device (``torch.device``): An object representing the device on which
     tensors are allocated.
-
     """
 
     def __init__(self, model, data_loader, optim, criterion, metric, device):
@@ -30,6 +29,9 @@ class Train:
 
         Keyword arguments:
         - iteration_loss (``bool``, optional): Prints loss at every step.
+        - trainmal (``bool``, optional): If true, trains the attacker using 
+                                            a two-task loss
+                                         else, trains the victim using the normal loss
 
         Returns:
         - The epoch loss (float).
@@ -67,9 +69,7 @@ class Train:
                 outputs = self.model(inputs)
 
                 dist,vloss = self.criterion(outputs, labels)
-                # loss = self.criterion(outputs,inputs)
                 loss = .1*dist - 100*vloss
-                # loss = -dist
 
                 # Backpropagation
                 self.optim.zero_grad()
